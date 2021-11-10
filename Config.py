@@ -1,0 +1,20 @@
+SCREEN_SIZE = (800, 600)
+GAME_NAME = "2D-MC"
+
+BLOCK_SIZE = 50 # 一个网格的大小
+
+ROW_BLOCK_CNT = 16
+COLUMN_BLOCK_CNT = 12 # 记录每一行和每一列的元素个数
+
+BACKGROUND_COLOR = (255, 255, 255) # 默认白色
+LINE_COLOR = (127, 127, 127) # 默认灰色
+
+LINE_WIDTH = 2 # 网格线宽度
+BORDER_WIDTH = LINE_WIDTH
+PLAYER_LINE_WIDTH = LINE_WIDTH * 3
+
+SPEED = 0.4
+
+MESSAGE_FONT_NAME = "microsoftyaheimicrosoftyaheiui" # 使用系统字体
+MESSAGE_FONT_SIZE = 20
+MESSAGE_COLOR = (0, 0, 0)
