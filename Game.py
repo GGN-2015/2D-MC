@@ -12,6 +12,8 @@ import Method
 import Monster # 记录所有怪物的信息
 import Player
 
+running = True # 表示游戏正在进行
+
 def show_position(screen):
     x, y = Method.get_block_xy(Player.position_x, Player.position_y)
     Items.show_text(screen, (0, 0),'(%d,%d)' % (x, y)) # 在屏幕上 (0, 0) 位置显示一个字符串
@@ -79,7 +81,7 @@ def set_event_check(event): # 检测放置事件并处理
     if event.type == KEYDOWN:
         if event.key == K_SPACE:
             block_x, block_y = Method.get_block_xy(Player.position_x, Player.position_y) # 计算 block 的位置
-            Map.set_box(block_x, block_y) # 试图在 block_x, block_y 处放置一个箱子
+            Map.set_block(block_x, block_y) # 试图在 block_x, block_y 处放置一个箱子
 
 def shoot_event_check(event): # 检测发射事件变化
     if event.type == MOUSEBUTTONDOWN:
@@ -128,7 +130,9 @@ def draw_amos(screen): # 绘制屏幕上的所有子弹
         if Method.in_sight((pos_x, pos_y), (Player.position_x, Player.position_y), (dW, dH)):
             Items.draw_amo(screen, (pos_x, pos_y), (Player.position_x, Player.position_y)) # 在屏幕上绘制子弹
 
-        crash = Monster.crash_monster(pos_x, pos_y, vec_valocity) # 检测子弹是否打中了怪物
+        crash_m = Monster.crash_monster(pos_x, pos_y, vec_valocity) # 检测子弹是否打中了怪物
+        crash_b = Map.crash_block(pos_x, pos_y)
+        crash = crash_m or crash_b
         if time.time() - shoot_time < Config.AMO_SPAN[amo_weapon] and not crash:
             new_amo_list.append((pos_x + vec_valocity[0], pos_y + vec_valocity[1], vec_valocity, shoot_time, amo_weapon)) # 计算新的位置并加入子弹队列
     Map.amo_list = new_amo_list # 更新子弹序列
@@ -157,7 +161,16 @@ draw_background = lambda screen: (draw_all(screen))
 # ! 需要将这个接口赋值成事件处理工具
 event_processor = lambda event: (set_event_check(event), shoot_event_check(event), change_weapon_event_check(event))
 
+# ! 需要将这个接口赋值为每一步的事件处理算法
+step_calculation = lambda: (
+    move_event_check(), 
+    shoot_event_deal(), 
+    Monster.create_monster_demo(), 
+    Player.check_food_point_change()
+)
+
 class Game:
+    global running
     """定义游戏的主界面"""
     def __init__(self):
         """游戏初始化"""
@@ -172,16 +185,18 @@ class Game:
         global draw_background
         global event_processor # ! 使用事件处理接口解决问题
         while True:
-            for event in pygame.event.get(): # 检测所有事件
-                if event.type == pygame.QUIT:
-                    sys.exit()
-                else:
-                    event_processor(event) # 用事件处理机制处理
-                    pass
-            move_event_check()
-            shoot_event_deal() # 处理射击事件
-            Monster.create_monster_demo()
-            draw_background(self.screen)
+            if running:
+                for event in pygame.event.get(): # 检测所有事件
+                    if event.type == pygame.QUIT:
+                        sys.exit()
+                    else:
+                        event_processor(event) # 用事件处理机制处理
+                        pass
+                step_calculation()
+                draw_background(self.screen)
+            else:
+                draw_background(self.self.screen)
+                show_message(self.screen, Player.get_message() + "You die of hunger.\n")
             pygame.display.flip() # 更新显示窗口内容
 
 if __name__ == "__main__":

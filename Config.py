@@ -1,5 +1,5 @@
 SCREEN_SIZE = (800, 600)
-GAME_NAME = "2D-MC"
+GAME_NAME = "Survivor"
 
 BLOCK_SIZE = 50 # 一个网格的大小
 
@@ -55,3 +55,11 @@ MONSTER_COLOR = (200, 200, 200) # 深灰色
 MONSTER_SPAN = 0.5 # 每 0.5 秒生成一次僵尸
 MONSTER_OK = True # 记录当前是否可以生成僵尸
 MONSTER_FADE_TIME = 1 # 僵尸死亡后显示的时间
+
+DESTROYABLE = [
+    "ITEM_BLOCK" # 可摧毁的路障
+]
+
+FOOD_TIME_SPAN = 3 # 每 3s 减一点 food_point
+FOOD_POINT_MAX = 100 # 初始食物点数
+HIT_POINT_MAX = 100

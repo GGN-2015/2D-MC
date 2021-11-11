@@ -20,14 +20,14 @@ def draw_item_base(screen, block_xy, player_xy, border_color, box_color): # 绘�
     pygame.draw.rect(screen, box_color, (vec[0] - R, vec[1] - R, 2*R, 2*R))
     pygame.draw.rect(screen, border_color, (vec[0] - R, vec[1] - R, 2*R, 2*R), width = Config.LINE_WIDTH)
 
-def draw_item_box(screen, block_xy, player_xy): # 绘制一个箱子
+def draw_item_block(screen, block_xy, player_xy): # 绘制一个箱子
     draw_item_base(screen, block_xy, player_xy, Config.BORDER_COLOR, (0xde, 0xcb, 0x0e))
     
 def draw_undefine(screen, block_xy, player_xy): # 绘制一个未知方块的算法
     draw_item_base(screen, block_xy, player_xy, Config.BORDER_COLOR, Config.UNKNOW_COLOR)
 
 get_draw_method = { # 确定每种物品的绘图函数
-    "ITEM_BOX" : draw_item_box
+    "ITEM_BLOCK" : draw_item_block
 }
 
 def draw_item(screen, item_type, block_xy, player_xy):

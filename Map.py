@@ -6,11 +6,12 @@ import Player
 
 map_of_objects = {}
 amo_list = [] # 当前的子弹序列
+dead_list_of_objects = []
 
-def set_box(block_x, block_y):
+def set_block(block_x, block_y):
     global map_of_objects
     if map_of_objects.get((block_x, block_y)) == None:
-        map_of_objects[(block_x, block_y)] = "ITEM_BOX"
+        map_of_objects[(block_x, block_y)] = "ITEM_BLOCK"
 
 def shoot_amo(pos, dir_vec, speed = Config.AMO_SPEED): # amo = (pos_x, pos_y, vec_valocity, shoot_time)
     global amo_list
@@ -40,3 +41,15 @@ def get_dxdy(): # 计算屏幕的边距
 
 def get_maxlen(): # 屏幕对角线距离
     return Method.distance((0, 0), Config.SCREEN_SIZE)
+
+def crash_block(pos_x, pos_y): # 检测子弹是否达到了墙
+    global dead_list_of_objects
+    block_x, block_y = Method.get_block_xy(pos_x, pos_y)
+    if map_of_objects.get((block_x, block_y)) != None:
+        btype = map_of_objects[(block_x, block_y)]
+        if btype in Config.DESTROYABLE:
+            # dead_list_of_objects.append(map_of_objects[(block_x, block_y)])
+            del map_of_objects[(block_x, block_y)] # 子弹能直接拆墙
+        return True
+    else:
+        return False
