@@ -8,6 +8,7 @@ amo_count = {
 }
 
 weapon_list = ["WEAPON_PISTOL", "WEAPON_AK47"]
+on_fire = False # 正在射击
 
 position_x = 0
 position_y = 0 # 记录玩家所在的位置

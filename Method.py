@@ -62,4 +62,10 @@ def not_in_screen(pos_xy, player_xy, R = 50): # 判断点在不在屏幕上
     pos = get_screen_pos(pos_xy, player_xy)
     dW = Config.SCREEN_SIZE[0] // 2 + R
     dH = Config.SCREEN_SIZE[1] // 2 + R # R 是对生物半径的修正
-    return abs(pos[0]) > dW and abs(pos[1]) > dH
+    return abs(pos[0] - dW) > dW and abs(pos[1] - dH) > dH
+
+def average(lis1, lis2, alpha = 0.5):
+    newlis = []
+    for i in range(0, len(lis1)):
+        newlis.append(lis1[i] * alpha + lis2[i] * (1-alpha))
+    return tuple(newlis) # 将 list 打包成元组

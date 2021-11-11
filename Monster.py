@@ -58,11 +58,28 @@ def draw_moster(screen, mid_x, mid_y, monster_type):
 def create_monster_demo(): # 演示性制造僵尸
     if time.time() - last_monster >= Config.MONSTER_SPAN and Config.MONSTER_OK:
         x = random.randint(-1000, 1000)
-        y = random.randint(-800, 800)
+        y = random.randint(-1000, 1000)
         if Method.not_in_screen((x, y), Player.get_position()): # 只在地图外生成僵尸
             add_monster((x, y), "MONSTER_ZOMBIE", random.randint(3, 5))
 
+def draw_dead_moster(screen, pos_x, pos_y, mtype, alpha):
+    pos_in_screen = Method.get_screen_pos((pos_x, pos_y), Player.get_position())
+    color_now = Method.average(Config.MONSTER_COLOR, Config.WHITE, alpha)
+    pygame.draw.circle(screen, color_now, pos_in_screen, Config.MONSTER_R[mtype], width = Config.MONSTER_LINE_WIDTH)
+
 def draw_all_moster(screen):
+    global dead_list
     move_monster()
     for monster_pos, mtype, hp in monster_list:
         draw_moster(screen, monster_pos[0], monster_pos[1], mtype)
+    new_dead_list = []
+    for monster_pos, mtype, dead_time in dead_list:
+        alpha = 1 - (time.time() - dead_time) / Config.MONSTER_FADE_TIME # 当前僵尸的透明度
+        if alpha > 0:
+            draw_dead_moster(screen, monster_pos[0], monster_pos[1], mtype, alpha)
+            new_dead_list.append((monster_pos, mtype, dead_time))
+        else:
+            # don't show it
+            pass
+    dead_list = new_dead_list
+        

@@ -6,7 +6,8 @@ BLOCK_SIZE = 50 # 一个网格的大小
 ROW_BLOCK_CNT = 16
 COLUMN_BLOCK_CNT = 12 # 记录每一行和每一列的元素个数
 
-BACKGROUND_COLOR = (255, 255, 255) # 默认白色
+WHITE = (255, 255, 255)
+BACKGROUND_COLOR = WHITE # 默认白色
 LINE_COLOR = (127, 127, 127) # 默认灰色
 
 LINE_WIDTH = 2 # 网格线宽度
@@ -36,8 +37,8 @@ AMO_COLOR = (0, 0, 0)   # 子弹小球的颜色
 AMO_MAX = 30            # 屏幕上最多能够容纳的子弹个数
 
 WEAPON_REFRESH_TIME = {
-    "WEAPON_PISTOL": 0.2, # 手枪每 0.2 秒可以发射一发子弹
-    "WEAPON_AK47": 0.05 # AK47
+    "WEAPON_PISTOL": 0.3, # 手枪每 0.2 秒可以发射一发子弹
+    "WEAPON_AK47": 0.07 # AK47
 }
 
 MESSAGE_HEIGHT = 25 # 每行消息的高度
@@ -53,3 +54,4 @@ MONSTER_LINE_WIDTH = PLAYER_LINE_WIDTH
 MONSTER_COLOR = (200, 200, 200) # 深灰色
 MONSTER_SPAN = 0.5 # 每 0.5 秒生成一次僵尸
 MONSTER_OK = True # 记录当前是否可以生成僵尸
+MONSTER_FADE_TIME = 1 # 僵尸死亡后显示的时间

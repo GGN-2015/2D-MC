@@ -1,7 +1,7 @@
 import importlib
 from os import X_OK # reload 方法
 import pygame
-from pygame.constants import K_LEFT, K_RIGHT, K_SPACE, K_UP, K_DOWN, KEYDOWN
+from pygame.constants import K_LEFT, K_RIGHT, K_SPACE, K_UP, K_DOWN, KEYDOWN, MOUSEBUTTONDOWN, MOUSEBUTTONUP
 import sys
 import time
 
@@ -61,17 +61,19 @@ def draw_main_player(screen): # 在屏幕中心绘制主玩家
 def move_event_check(): # 检测玩家运动事件
     from pygame.constants import K_a, K_s, K_d, K_w
     old_x, old_y = Player.position_x, Player.position_y
+    dx, dy = 0, 0
     # importlib.reload(Config)
     key_pressed = pygame.key.get_pressed() # 这里的移动算法并不是很完美
     if key_pressed[K_a] or key_pressed[K_LEFT]:
-        Player.position_x -= Config.SPEED
+        dx -= 1
     if key_pressed[K_d] or key_pressed[K_RIGHT]:
-        Player.position_x += Config.SPEED
+        dx += 1
     if key_pressed[K_s] or key_pressed[K_DOWN]: 
-        Player.position_y += Config.SPEED
+        dy += 1
     if key_pressed[K_w] or key_pressed[K_UP]:
-        Player.position_y -= Config.SPEED
-    Player.position_x, Player.position_y = Map.test_new_pos((Player.position_x, Player.position_y), (old_x, old_y))
+        dy -= 1
+    dx, dy = Method.vec_mul(Method.normalize((dx, dy)), Config.SPEED)
+    Player.position_x, Player.position_y = Map.test_new_pos((old_x + dx, old_y + dy), (old_x, old_y))
 
 def set_event_check(event): # 检测放置事件并处理
     if event.type == KEYDOWN:
@@ -79,12 +81,17 @@ def set_event_check(event): # 检测放置事件并处理
             block_x, block_y = Method.get_block_xy(Player.position_x, Player.position_y) # 计算 block 的位置
             Map.set_box(block_x, block_y) # 试图在 block_x, block_y 处放置一个箱子
 
-def shoot_event_check(event):
-    from pygame.constants import MOUSEBUTTONDOWN
-    if event.type == MOUSEBUTTONDOWN: # shoot
+def shoot_event_check(event): # 检测发射事件变化
+    if event.type == MOUSEBUTTONDOWN:
+        Player.on_fire = True
+    if event.type == MOUSEBUTTONUP:
+        Player.on_fire = False
+
+def shoot_event_deal():
+    if Player.on_fire: # shoot
         if time.time() - Player.last_fire_time > Config.WEAPON_REFRESH_TIME[Player.get_weapon_name()]: # 当前武器已经缓冲完毕
             if Player.amo_count[Player.get_weapon_name()] != 0:
-                pos = event.pos # 获取鼠标在屏幕上的点击位置
+                pos = pygame.mouse.get_pos() # 鼠标的坐标
                 dW = Config.SCREEN_SIZE[0] // 2
                 dH = Config.SCREEN_SIZE[1] // 2 # 玩家在屏幕上的位置
                 vec = Method.vec_sub(pos, (dW, dH)) # 计算子弹速度方向
@@ -172,6 +179,7 @@ class Game:
                     event_processor(event) # 用事件处理机制处理
                     pass
             move_event_check()
+            shoot_event_deal() # 处理射击事件
             Monster.create_monster_demo()
             draw_background(self.screen)
             pygame.display.flip() # 更新显示窗口内容
