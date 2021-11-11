@@ -32,10 +32,12 @@ def round(p): # 四舍五入
 def get_block_xy(x, y):
     return (round(x / Config.BLOCK_SIZE), round(y / Config.BLOCK_SIZE)) # 四舍五入找到最近的 block
 
-def in_sight(pos_now, pos_player, dxdy): # 检查一个物品是否在玩家的视线范围内，也就是是否需要在屏幕上显示
+def in_sight(pos_now, pos_player, dxdy, safe_span = 100): # 检查一个物品是否在玩家的视线范围内，也就是是否需要在屏幕上显示
     px, py = pos_now
     nx, ny = pos_player
     dx, dy = dxdy
+    dx += safe_span
+    dy += safe_span # 从屏幕外的一段距离就开始加载，放置突然闪入的情况
     xmin = nx - dx # xmin, xmax, ymin, ymax 是玩家可见的矩形区域
     xmax = nx + dx
     ymin = ny - dy

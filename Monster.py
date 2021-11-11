@@ -1,6 +1,7 @@
-import time
+import math
 import pygame
 import random
+import time
 
 import Config
 import Game
@@ -57,8 +58,12 @@ def draw_moster(screen, mid_x, mid_y, monster_type):
 
 def create_monster_demo(): # 演示性制造僵尸
     if time.time() - last_monster >= Config.MONSTER_SPAN and Config.MONSTER_OK:
-        x = random.randint(-1000, 1000)
-        y = random.randint(-1000, 1000)
+        r = random.randint(Map.get_maxlen() // 2, Map.get_maxlen() * 2)
+        theta = random.randint(-180, 179) / 360 * 2 * math.pi # rad
+        dx = r * math.cos(theta)
+        dy = r * math.sin(theta)
+        x = Player.position_x + dx
+        y = Player.position_y + dy
         if Method.not_in_screen((x, y), Player.get_position()): # 只在地图外生成僵尸
             add_monster((x, y), "MONSTER_ZOMBIE", random.randint(3, 5))
 
@@ -69,9 +74,20 @@ def draw_dead_moster(screen, pos_x, pos_y, mtype, alpha):
 
 def draw_all_moster(screen):
     global dead_list
+    global monster_list
     move_monster()
+    new_monster_list = []
     for monster_pos, mtype, hp in monster_list:
-        draw_moster(screen, monster_pos[0], monster_pos[1], mtype)
+        if Method.in_sight(monster_pos, Player.get_position(), Map.get_dxdy()):
+            draw_moster(screen, monster_pos[0], monster_pos[1], mtype)
+            new_monster_list.append((monster_pos, mtype, hp))
+        else:
+            if Method.distance(monster_pos, Player.get_position()) >= 2 * Map.get_maxlen(): # 对距离太远的僵尸进行 despwan
+                pass
+            else:
+                new_monster_list.append((monster_pos, mtype, hp))
+    monster_list = new_monster_list
+
     new_dead_list = []
     for monster_pos, mtype, dead_time in dead_list:
         alpha = 1 - (time.time() - dead_time) / Config.MONSTER_FADE_TIME # 当前僵尸的透明度

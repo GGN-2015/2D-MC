@@ -32,3 +32,11 @@ def test_new_pos(new_pos, old_pos): # 检测新的位置是否能走过去
         else:
             # 没有障碍物，什么都不用做
             return new_x, new_y
+
+def get_dxdy(): # 计算屏幕的边距
+    dW = Config.SCREEN_SIZE[0] // 2
+    dH = Config.SCREEN_SIZE[1] // 2
+    return (dW, dH)
+
+def get_maxlen(): # 屏幕对角线距离
+    return Method.distance((0, 0), Config.SCREEN_SIZE)
