@@ -32,3 +32,34 @@ def round(p): # 四舍五入
 def get_block_xy(x, y):
     return (round(x / Config.BLOCK_SIZE), round(y / Config.BLOCK_SIZE)) # 四舍五入找到最近的 block
 
+def in_sight(pos_now, pos_player, dxdy): # 检查一个物品是否在玩家的视线范围内，也就是是否需要在屏幕上显示
+    px, py = pos_now
+    nx, ny = pos_player
+    dx, dy = dxdy
+    xmin = nx - dx # xmin, xmax, ymin, ymax 是玩家可见的矩形区域
+    xmax = nx + dx
+    ymin = ny - dy
+    ymax = ny + dy
+    return xmin <= px and px <= xmax and ymin <= py and py <= ymax
+
+def get_screen_pos(pos_xy, player_xy): # 将地图坐标映射到屏幕坐标
+    block_x, block_y = pos_xy
+    pos_x, pos_y = player_xy
+    o_x, o_y = pos_x - Config.SCREEN_SIZE[0] // 2, pos_y - Config.SCREEN_SIZE[1] // 2
+    vec = vec_sub((block_x, block_y), (o_x, o_y)) # 得到相对于左上角的坐标
+    return vec
+
+def get_pos_in_map(pos_on_screen, player_xy):   # 根据屏幕上的坐标计算玩家的坐标
+    dW = Config.SCREEN_SIZE[0] // 2
+    dH = Config.SCREEN_SIZE[1] // 2             # 玩家在屏幕上的位置
+    vec = vec_sub(pos_on_screen, (dW, dH))      # 相对玩家的位移
+    return vec_add(player_xy, vec)              # 得到游戏地图中的坐标
+
+def circle_crash(pos1, R1, pos2, R2):
+    return distance(pos1, pos2) <= R1 + R2 # 两个圆有相交部分
+
+def not_in_screen(pos_xy, player_xy, R = 50): # 判断点在不在屏幕上
+    pos = get_screen_pos(pos_xy, player_xy)
+    dW = Config.SCREEN_SIZE[0] // 2 + R
+    dH = Config.SCREEN_SIZE[1] // 2 + R # R 是对生物半径的修正
+    return abs(pos[0]) > dW and abs(pos[1]) > dH
