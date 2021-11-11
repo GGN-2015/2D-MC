@@ -1,2 +1,2 @@
-# 2D-MC
- 2D minecraft like game, for creation or survival.
+# Survivor
+ 2D shooting game made by pygame, for creation or survival.
