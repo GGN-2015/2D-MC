@@ -37,8 +37,8 @@ def check_food_point_change():
             if hit_point > 0:
                 hit_point -= 1
             else:
-                # print("You die of hunger.")
-                Game.running = False
+                print("You die of hunger.")
+                Config.GAME_RUNNING = False
 
 
 def get_message(): # 获得玩家消息字符串

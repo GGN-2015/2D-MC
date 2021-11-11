@@ -63,3 +63,5 @@ DESTROYABLE = [
 FOOD_TIME_SPAN = 3 # 每 3s 减一点 food_point
 FOOD_POINT_MAX = 100 # 初始食物点数
 HIT_POINT_MAX = 100
+
+GAME_RUNNING = True # 游戏仍在继续进行

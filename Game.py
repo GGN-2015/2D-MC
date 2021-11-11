@@ -1,5 +1,3 @@
-import importlib
-from os import X_OK # reload 方法
 import pygame
 from pygame.constants import K_LEFT, K_RIGHT, K_SPACE, K_UP, K_DOWN, KEYDOWN, MOUSEBUTTONDOWN, MOUSEBUTTONUP
 import sys
@@ -11,8 +9,6 @@ import Map
 import Method
 import Monster # 记录所有怪物的信息
 import Player
-
-running = True # 表示游戏正在进行
 
 def show_position(screen):
     x, y = Method.get_block_xy(Player.position_x, Player.position_y)
@@ -170,7 +166,7 @@ step_calculation = lambda: (
 )
 
 class Game:
-    global running
+    running = True
     """定义游戏的主界面"""
     def __init__(self):
         """游戏初始化"""
@@ -185,17 +181,17 @@ class Game:
         global draw_background
         global event_processor # ! 使用事件处理接口解决问题
         while True:
-            if running:
-                for event in pygame.event.get(): # 检测所有事件
-                    if event.type == pygame.QUIT:
-                        sys.exit()
-                    else:
+            for event in pygame.event.get(): # 检测所有事件
+                if event.type == pygame.QUIT:
+                    sys.exit()
+                else:
+                    if Config.GAME_RUNNING:
                         event_processor(event) # 用事件处理机制处理
-                        pass
+            if Config.GAME_RUNNING:
                 step_calculation()
                 draw_background(self.screen)
             else:
-                draw_background(self.self.screen)
+                draw_background(self.screen)
                 show_message(self.screen, Player.get_message() + "You die of hunger.\n")
             pygame.display.flip() # 更新显示窗口内容
 

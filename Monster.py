@@ -75,7 +75,8 @@ def draw_dead_moster(screen, pos_x, pos_y, mtype, alpha):
 def draw_all_moster(screen):
     global dead_list
     global monster_list
-    move_monster()
+    if Config.GAME_RUNNING: # 游戏结束后不要再移动 monster
+        move_monster()
     new_monster_list = []
     for monster_pos, mtype, hp in monster_list:
         if Method.in_sight(monster_pos, Player.get_position(), Map.get_dxdy()):
