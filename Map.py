@@ -42,10 +42,21 @@ def test_new_pos(new_pos, old_pos): # 检测新的位置是否能走过去
     old_x, old_y = old_pos
     block_new_x, block_new_y = Method.get_block_xy(new_x, new_y)
     block_x, block_y = Method.get_block_xy(old_x, old_y)
+    dis = Method.distance(old_pos, new_pos) # 计算距离
     if(block_y == block_new_y and block_x == block_new_x): # 在同一个格子里爱怎么走怎么走
         return new_x, new_y
     else:
         if map_of_objects.get((block_new_x, block_new_y)) != None: # 有障碍物
+            dirs = [(0, 1), (0, -1), (1, 0), (-1, 0)]
+            for i in range(0, len(dirs)):
+                if Method.vec_sub((block_new_x, block_new_y), (block_x, block_y)) == dirs[i]: # 减小障碍物的摩擦力
+                    if dirs[i][0] == 0:
+                        tmp_x = old_x + dis
+                        tmp_y = old_y
+                    elif dirs[i][1] == 0:
+                        tmp_x = old_x
+                        tmp_y = new_y + dis
+                    return tmp_x, tmp_y
             return old_x, old_y
         else:
             # 没有障碍物，什么都不用做

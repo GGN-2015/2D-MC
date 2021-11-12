@@ -155,7 +155,11 @@ def draw_all(screen):        # 绘制全部对象
 draw_background = lambda screen: (draw_all(screen))
 
 # ! 需要将这个接口赋值成事件处理工具
-event_processor = lambda event: (set_event_check(event), shoot_event_check(event), change_weapon_event_check(event))
+event_processor = lambda event: (
+    # set_event_check(event), 
+    shoot_event_check(event), 
+    change_weapon_event_check(event)
+)
 
 # ! 需要将这个接口赋值为每一步的事件处理算法
 step_calculation = lambda: (

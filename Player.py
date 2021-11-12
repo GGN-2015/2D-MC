@@ -34,6 +34,7 @@ def damage():
         last_damage = time.time()
     if hit_point <= 0:
         Config.GAME_RUNNING = False # you died
+        Config.GAME_OVER_TIME = time.time()
 
 def player_around_aid_box(): # 检测周围有没有 aid_box
     global amo_count
@@ -61,13 +62,16 @@ def check_food_point_change():
             if hit_point > 0:
                 hit_point -= 1
             else:
-                print("You die of hunger.")
+                # print("You die of hunger.")
                 Config.GAME_RUNNING = False
+                Config.GAME_OVER_TIME = time.time()
+
 
 
 def get_message(): # 获得玩家消息字符串
     global amo_count
     POS = "Position: (%d, %d)\n" % Method.get_block_xy(position_x, position_y)
+    TIM = "Time: %s\n" % Method.get_game_time()
     WPN = "Weapon: %s\n" % get_weapon_name()
     if amo_count[get_weapon_name()] >= 0:
         AMO = "amo: %d\n" % amo_count[get_weapon_name()]
@@ -75,7 +79,7 @@ def get_message(): # 获得玩家消息字符串
         AMO = "amo: infinity\n"
     HP = "HitPoint: %d\n" % hit_point
     FP = "FoodPoint: %d\n" % food_point
-    return POS + WPN + AMO + HP + FP
+    return POS + TIM + WPN + AMO + HP + FP
 
 def get_position():
     return (position_x, position_y) # 反馈位置信息

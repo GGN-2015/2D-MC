@@ -82,8 +82,8 @@ def move_monster(): # 将所有 Monster 向前移动一定长度
     global monster_list
     new_monster_list = []
     for monster_pos, mtype, hp, monster_id in monster_list: # monster ID
-        # delta_vec = Method.vec_mul(Method.normalize(Method.vec_sub(Player.get_position(), monster_pos)), Config.MONSTER_SPEED)
-        delta_vec = Method.vec_mul(get_monster_dir(monster_pos, monster_id), Config.MONSTER_SPEED)
+        # delta_vec = Method.vec_mul(Method.normalize(Method.vec_sub(Player.get_position(), monster_pos)), Config.MONSTER_SPEED())
+        delta_vec = Method.vec_mul(get_monster_dir(monster_pos, monster_id), Config.MONSTER_SPEED())
         new_pos = Method.vec_add(monster_pos, delta_vec)
         monster_pos = Map.test_new_pos(new_pos, monster_pos)
         if hp > 0:

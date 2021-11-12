@@ -1,3 +1,5 @@
+import time
+
 SCREEN_SIZE = (800, 600)
 GAME_NAME = "Survivor"
 
@@ -19,7 +21,7 @@ BORDER_WIDTH = LINE_WIDTH
 PLAYER_LINE_WIDTH = LINE_WIDTH * 3
 PLAYER_R = BLOCK_SIZE // 2
 
-SPEED = 0.4 # 玩家默认移动速度
+SPEED = 0.4 * 2 # 玩家默认移动速度
 AMO_SPEED = 10 * SPEED
 
 MESSAGE_FONT_NAME = "microsoftyaheimicrosoftyaheiui" # 使用系统字体
@@ -46,7 +48,14 @@ WEAPON_REFRESH_TIME = {
 
 MESSAGE_HEIGHT = 25 # 每行消息的高度
 
-MONSTER_SPEED = 0.65 * SPEED # 僵尸的默认移动速度
+MONSTER_BASIC_SPEED = 0.65 * SPEED  # 僵尸的默认移动速度
+MONSTER_ACCELERATION = MONSTER_BASIC_SPEED * 0.15 # 僵尸每分钟的加速度
+
+BEGIN_TIME = time.time()
+
+def MONSTER_SPEED():
+    return (time.time() - BEGIN_TIME) / 60 * MONSTER_ACCELERATION + MONSTER_BASIC_SPEED
+
 MONSTER_R = {
     "MONSTER_ZOMBIE": BLOCK_SIZE // 2 # 普通僵尸的半径
 }
@@ -59,7 +68,7 @@ MONSTER_SPAN = 0.5 # 每 0.5 秒生成一次僵尸
 MONSTER_OK = True # 记录当前是否可以生成僵尸
 MONSTER_FADE_TIME = 1 # 僵尸死亡后显示的时间
 
-AID_BOX_SPAN = 5 # 没 5 秒生成一个宝箱
+AID_BOX_SPAN = 4 # 没 5 秒生成一个宝箱
 
 MAX_SEARCH_DEPTH = 10 # 僵尸寻路的最大层数
 
@@ -83,3 +92,4 @@ GAME_RUNNING = True # 游戏仍在继续进行
 POSITION_EPS = 10 # 10 bit position
 
 DAMAGE_SPAN = 0.07 # 每 0.07 秒 掉一滴血
+GAME_OVER_TIME = None

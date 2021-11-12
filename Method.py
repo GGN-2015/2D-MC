@@ -1,5 +1,6 @@
 import math
 import random
+import time
 
 import Config
 
@@ -101,3 +102,16 @@ def in_midddle(monster_pos):
     block_xy = get_block_xy(*monster_pos)
     mid = get_mid_of_block(block_xy)
     return distance(mid, monster_pos) < Config.POSITION_EPS # 离中心很近
+
+def get_game_time():
+    if Config.GAME_RUNNING:
+        TIM = time.time() - Config.BEGIN_TIME
+    else:
+        TIM = Config.GAME_OVER_TIME - Config.BEGIN_TIME
+    TIM = int(TIM)
+    if TIM < 60:
+        return str(TIM) + " sec"
+    elif TIM >= 60 and TIM < 3600:
+        return str(TIM // 60) + " min " + str(TIM % 60) + " sec"
+    else:
+        return str(TIM // 3600) + " hr " + str((TIM % 3600) // 60) + " min " + str(TIM % 60) + " sec"
