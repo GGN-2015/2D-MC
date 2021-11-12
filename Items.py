@@ -1,12 +1,14 @@
-# 材质包
+# 材质包文件 Items.py
+# 对材质包进行修改不会造成游戏本质的改变
+
 import pygame
 
 import Config
 import Method
 
-def show_text(screen, screen_xy, message_str: str):
+def show_text(screen, screen_xy, message_str: str, text_color = Config.MESSAGE_COLOR):
     font = pygame.font.SysFont(Config.MESSAGE_FONT_NAME, Config.MESSAGE_FONT_SIZE) # 使用系统字体
-    text = font.render(message_str, True, Config.MESSAGE_COLOR)
+    text = font.render(message_str, True, text_color)
     screen.blit(text, screen_xy)
 
 def draw_amo(screen, amo_pos, player_pos):
@@ -44,3 +46,6 @@ def draw_item(screen, item_type, block_xy, player_xy):
     else:
         draw_method = draw_undefine
     draw_method(screen, block_xy, player_xy) # 根据找到的函数进行绘制
+
+def draw_rect(screen, screen_xy, width_xy, color, width = 0): # 绘制实心矩形
+    pygame.draw.rect(screen, color, (screen_xy[0], screen_xy[1], width_xy[0], width_xy[1]), width)

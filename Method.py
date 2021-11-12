@@ -1,4 +1,5 @@
 import math
+import pygame
 import random
 import time
 
@@ -103,12 +104,16 @@ def in_midddle(monster_pos):
     mid = get_mid_of_block(block_xy)
     return distance(mid, monster_pos) < Config.POSITION_EPS # 离中心很近
 
-def get_game_time():
+def get_sec_in_game():
+    """计算游戏开始到 现在/游戏结束 时所经过的秒数"""
     if Config.GAME_RUNNING:
         TIM = time.time() - Config.BEGIN_TIME
     else:
         TIM = Config.GAME_OVER_TIME - Config.BEGIN_TIME
-    TIM = int(TIM)
+    return int(TIM)
+
+def get_game_time():
+    TIM = get_sec_in_game()
     if TIM < 60:
         return str(TIM) + " sec"
     elif TIM >= 60 and TIM < 3600:

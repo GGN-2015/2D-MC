@@ -1,10 +1,11 @@
 import pygame
-from pygame.constants import K_LEFT, K_RIGHT, K_SPACE, K_UP, K_DOWN, KEYDOWN, MOUSEBUTTONDOWN, MOUSEBUTTONUP
+from pygame.constants import K_LEFT, K_RIGHT, K_SPACE, K_UP, K_DOWN, KEYDOWN, MOUSEBUTTONDOWN, MOUSEBUTTONUP, K_p
 import sys
 import time
 
 import Config
 import Items
+import Bars
 import Map
 import Method
 import Monster # 记录所有怪物的信息
@@ -79,6 +80,12 @@ def set_event_check(event): # 检测放置事件并处理
             block_x, block_y = Method.get_block_xy(Player.position_x, Player.position_y) # 计算 block 的位置
             Map.set_block(block_x, block_y) # 试图在 block_x, block_y 处放置一个箱子
 
+def check_pause_event(event):
+    """检测是否游戏暂停"""
+    if event.type == KEYDOWN:
+        if event.key == K_p:
+            Config.PAUSED = not Config.PAUSED
+
 def shoot_event_check(event): # 检测发射事件变化
     if event.type == MOUSEBUTTONDOWN:
         Player.on_fire = True
@@ -150,16 +157,18 @@ def draw_all(screen):        # 绘制全部对象
     draw_amos(screen)        # 绘制所有子弹
     show_message(screen, Player.get_message()) # 左上角显示玩家的各种信息
     Monster.draw_all_moster(screen) # 绘制所有怪物
+    Bars.draw_life_bar(screen)
+    Bars.draw_ammo_bar(screen) # 绘制子弹数条
 
 # ! 需要将这个接口赋值成绘制背景图像的算法
 draw_background = lambda screen: (draw_all(screen))
 
 # ! 需要将这个接口赋值成事件处理工具
-event_processor = lambda event: (
+event_processor = lambda event: ((
     # set_event_check(event), 
     shoot_event_check(event), 
     change_weapon_event_check(event)
-)
+) if not Config.PAUSED else None ) # 暂停状态下不允许开枪换武器
 
 # ! 需要将这个接口赋值为每一步的事件处理算法
 step_calculation = lambda: (
@@ -195,13 +204,17 @@ class Game:
                     if Config.GAME_RUNNING:
                         event_processor(event) # 用事件处理机制处理
             if Config.GAME_RUNNING:
-                step_calculation()
+                if not Config.PAUSED: # 如果没暂停要计算下一步
+                    step_calculation()
                 draw_background(self.screen)
             else:
                 draw_background(self.screen)
                 show_message(self.screen, Player.get_message() + "You died.\n")
             pygame.display.flip() # 更新显示窗口内容
 
-if __name__ == "__main__":
+def main():
     game = Game()
     game.run_game()
+
+if __name__ == "__main__": # 执行主程序中的内容
+    main()

@@ -30,6 +30,7 @@ def crash_monster(pos_x, pos_y, vec_dir): # vec_dir 记录子弹的速度向量
             monster_pos = Method.vec_add(monster_pos, Method.vec_mul(vec_dir, Config.HIT_BACK)) # 击退
         if hp <= 0: # 僵尸死亡
             dead_list.append((monster_pos, mtype, time.time())) # 添加死亡僵尸
+            Player.player_score += Config.MONSTER_SCORE
         else:
             new_monster_list.append((monster_pos, mtype, hp, ID)) # 追加到新的僵尸序列中
     monster_list = new_monster_list
@@ -52,10 +53,11 @@ def not_reach(pos_xy, monster_id):
         return Method.distance(pos_xy, monster_target[monster_id]) < Config.POSITION_EPS
 
 def check_monster_crash_player(): # 检测是否有僵尸打到了玩家
+    cnt = 0
     for pos_xy, mtype, hit_point, monster_id in monster_list:
         if Method.circle_crash(Player.get_position(), Config.PLAYER_R, pos_xy, Config.MONSTER_R[mtype]):
-            Player.damage() # 让玩家掉血
-        pass
+            cnt += 1
+    Player.damage(cnt) # 让玩家掉血
 
 def get_monster_dir(monster_pos, monster_id): # 计算怪物当前的朝向
     # global monster_target

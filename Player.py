@@ -14,11 +14,27 @@ on_fire = False # 正在射击
 
 position_x = 0
 position_y = 0 # 记录玩家所在的位置
-color_of_main = (255, 0, 0) # 主人公的颜色
+color_of_main = Config.BLUE # 主人公的颜色
 
 last_fire_time = time.time() # 上次开枪的时间
 # weapon_now = "WEAPON_PISTOL" # 当前使用的武器
 weapon_id_now = 0
+
+player_score = 0
+time_score = 0
+
+last_score_time = time.time()
+
+def get_score():
+    global last_score_time # 计算上一次得秒数分的时间
+    global time_score
+    if not Config.PAUSED and Config.GAME_RUNNING:
+        if time.time() - last_score_time >= 1:
+            last_score_time = time.time()
+            time_score += 10
+    else:
+        last_score_time = time.time()
+    return time_score + player_score
 
 hit_point = Config.HIT_POINT_MAX # 生命值
 food_point = Config.FOOD_POINT_MAX # 饥饿度，food_point = 0 时开始掉生命值
@@ -26,11 +42,16 @@ food_point = Config.FOOD_POINT_MAX # 饥饿度，food_point = 0 时开始掉生�
 last_eat_food = time.time()
 last_damage = time.time()
 
-def damage():
+def damage(cnt = 1):
     global last_damage
     global hit_point
+    global food_point
     if time.time() - last_damage > Config.DAMAGE_SPAN and hit_point > 0:
-        hit_point -= 1
+        if food_point >= cnt: # 掉血优先掉饥饿值
+            food_point -= cnt
+        else:
+            food_point = 0
+            hit_point = max(hit_point - cnt, 0)
         last_damage = time.time()
     if hit_point <= 0:
         Config.GAME_RUNNING = False # you died
@@ -73,13 +94,14 @@ def get_message(): # 获得玩家消息字符串
     POS = "Position: (%d, %d)\n" % Method.get_block_xy(position_x, position_y)
     TIM = "Time: %s\n" % Method.get_game_time()
     WPN = "Weapon: %s\n" % get_weapon_name()
-    if amo_count[get_weapon_name()] >= 0:
-        AMO = "amo: %d\n" % amo_count[get_weapon_name()]
-    else:
-        AMO = "amo: infinity\n"
-    HP = "HitPoint: %d\n" % hit_point
-    FP = "FoodPoint: %d\n" % food_point
-    return POS + TIM + WPN + AMO + HP + FP
+    SCO = "Score: %d\n" % get_score()
+    # if amo_count[get_weapon_name()] >= 0:
+    #     AMO = "amo: %d\n" % amo_count[get_weapon_name()]
+    # else:
+    #     AMO = "amo: infinity\n"
+    # HP = "HitPoint: %d\n" % hit_point
+    # FP = "FoodPoint: %d\n" % food_point
+    return POS + TIM + WPN + SCO # + AMO + HP + FP
 
 def get_position():
     return (position_x, position_y) # 反馈位置信息
