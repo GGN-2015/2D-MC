@@ -1,3 +1,6 @@
+import math
+import random
+
 import Config
 
 def distance(pointA, pointB): # 计算两点之间的距离
@@ -66,8 +69,35 @@ def not_in_screen(pos_xy, player_xy, R = 50): # 判断点在不在屏幕上
     dH = Config.SCREEN_SIZE[1] // 2 + R # R 是对生物半径的修正
     return abs(pos[0] - dW) > dW and abs(pos[1] - dH) > dH
 
+def random_near_position(xnow, ynow, Rmin, Rmax):
+    """随机生成一个附近的点"""
+    r = random.randint(Rmin, Rmax)
+    theta = random.randint(-180, 179) / 360 * 2 * math.pi # rad
+    dx = r * math.cos(theta)
+    dy = r * math.sin(theta)
+    x = xnow + dx
+    y = ynow + dy
+    return (x, y) # 返回一个附近的随机点
+
 def average(lis1, lis2, alpha = 0.5):
     newlis = []
     for i in range(0, len(lis1)):
         newlis.append(lis1[i] * alpha + lis2[i] * (1-alpha))
     return tuple(newlis) # 将 list 打包成元组
+
+def L1_dis(pos1, pos2): # 计算曼哈顿距离
+    ans = 0
+    for i in range(0, len(pos1)):
+        ans += abs(pos1[i] - pos2[i]) # 每个维度计算差值的绝对值
+    return ans
+
+def get_mid_of_block(block_xy): # 根据网格坐标计算网格中点的地图坐标
+    block_x, block_y = block_xy
+    px, py = block_x * Config.BLOCK_SIZE, block_y * Config.BLOCK_SIZE
+    half_block =  Config.BLOCK_SIZE // 2
+    return (px + half_block, py + half_block) # 左上角坐标然后再加半个格子的坐标
+
+def in_midddle(monster_pos):
+    block_xy = get_block_xy(*monster_pos)
+    mid = get_mid_of_block(block_xy)
+    return distance(mid, monster_pos) < Config.POSITION_EPS # 离中心很近

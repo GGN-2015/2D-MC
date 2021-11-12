@@ -1,12 +1,12 @@
 import time
 
 import Config
-import Game
+import Map
 import Method
 
 amo_count = {
     "WEAPON_PISTOL": -1, # < 0 表示无限子弹
-    "WEAPON_AK47": 1000
+    "WEAPON_AK47": 500
 }
 
 weapon_list = ["WEAPON_PISTOL", "WEAPON_AK47"]
@@ -24,6 +24,30 @@ hit_point = Config.HIT_POINT_MAX # 生命值
 food_point = Config.FOOD_POINT_MAX # 饥饿度，food_point = 0 时开始掉生命值
 
 last_eat_food = time.time()
+last_damage = time.time()
+
+def damage():
+    global last_damage
+    global hit_point
+    if time.time() - last_damage > Config.DAMAGE_SPAN and hit_point > 0:
+        hit_point -= 1
+        last_damage = time.time()
+    if hit_point <= 0:
+        Config.GAME_RUNNING = False # you died
+
+def player_around_aid_box(): # 检测周围有没有 aid_box
+    global amo_count
+    global food_point
+    dirs = [(0, 1), (0, -1), (1, 0), (-1, 0)]
+    bx, by = Method.get_block_xy(*get_position())
+    for dx, dy in dirs:
+        nx = bx + dx
+        ny = by + dy
+        if Map.map_of_objects.get((nx, ny)) == "ITEM_AID_BOX":
+            Map.map_of_objects[(nx, ny)] = "ITEM_USED_AID_BOX"
+            amo_count["WEAPON_AK47"] += 200
+            food_point = Config.FOOD_POINT_MAX # 直接吃饱了
+    pass
 
 def check_food_point_change():
     global food_point

@@ -7,8 +7,11 @@ ROW_BLOCK_CNT = 16
 COLUMN_BLOCK_CNT = 12 # 记录每一行和每一列的元素个数
 
 WHITE = (255, 255, 255)
+GREEN = (0x00, 0x80, 0x00)
+GREY = (127, 127, 127)
+
 BACKGROUND_COLOR = WHITE # 默认白色
-LINE_COLOR = (127, 127, 127) # 默认灰色
+LINE_COLOR = GREY # 默认灰色
 
 LINE_WIDTH = 2 # 网格线宽度
 BORDER_WIDTH = LINE_WIDTH
@@ -56,8 +59,20 @@ MONSTER_SPAN = 0.5 # 每 0.5 秒生成一次僵尸
 MONSTER_OK = True # 记录当前是否可以生成僵尸
 MONSTER_FADE_TIME = 1 # 僵尸死亡后显示的时间
 
+AID_BOX_SPAN = 5 # 没 5 秒生成一个宝箱
+
+MAX_SEARCH_DEPTH = 10 # 僵尸寻路的最大层数
+
 DESTROYABLE = [
     "ITEM_BLOCK" # 可摧毁的路障
+]
+
+TRANSPARENT = [ # 透明方块
+
+]
+
+PASSABLE = [ # 课穿过方块
+
 ]
 
 FOOD_TIME_SPAN = 3 # 每 3s 减一点 food_point
@@ -65,3 +80,6 @@ FOOD_POINT_MAX = 100 # 初始食物点数
 HIT_POINT_MAX = 100
 
 GAME_RUNNING = True # 游戏仍在继续进行
+POSITION_EPS = 10 # 10 bit position
+
+DAMAGE_SPAN = 0.07 # 每 0.07 秒 掉一滴血

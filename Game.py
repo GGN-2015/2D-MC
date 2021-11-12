@@ -162,7 +162,10 @@ step_calculation = lambda: (
     move_event_check(), 
     shoot_event_deal(), 
     Monster.create_monster_demo(), 
-    Player.check_food_point_change()
+    Player.check_food_point_change(),
+    Monster.check_monster_crash_player(),
+    Map.random_set_aid_box(), # 随机放置救助箱子
+    Player.player_around_aid_box() # 检测周围有没有
 )
 
 class Game:
@@ -192,7 +195,7 @@ class Game:
                 draw_background(self.screen)
             else:
                 draw_background(self.screen)
-                show_message(self.screen, Player.get_message() + "You die of hunger.\n")
+                show_message(self.screen, Player.get_message() + "You died.\n")
             pygame.display.flip() # 更新显示窗口内容
 
 if __name__ == "__main__":

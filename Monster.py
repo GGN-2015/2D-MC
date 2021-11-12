@@ -3,21 +3,27 @@ import pygame
 import random
 import time
 
+# import Astar
 import Config
 import Game
 import Map
 import Method
 import Player
 
-monster_list = []               # 僵尸队列, monster = ((pos_x, pos_y), "MONSTER_TYPE", hit_point)
+monster_list = []               # 僵尸队列, monster = ((pos_x, pos_y), "MONSTER_TYPE", hit_point, monster_id)
+monster_target = {
+    # 记录当前怪物的前进方向目标点
+}
 dead_list = []                  # 死亡的僵尸队列, monster = ((pos_x, pos_y), "MONSTER_TYPE", dead_time)
 last_monster = time.time()      # 记录上次生成 Monster 的时间
+
+monster_count = 0 # 统计怪物的总数
 
 def crash_monster(pos_x, pos_y, vec_dir): # vec_dir 记录子弹的速度向量
     global monster_list
     crashed = False
     new_monster_list = []
-    for monster_pos, mtype, hp in monster_list:
+    for monster_pos, mtype, hp, ID in monster_list:
         if Method.circle_crash((pos_x, pos_y), Config.AMO_R, monster_pos, Config.MONSTER_R[mtype]): # 计算圆交是否存在
             crashed = True
             hp -= 1
@@ -25,26 +31,63 @@ def crash_monster(pos_x, pos_y, vec_dir): # vec_dir 记录子弹的速度向量
         if hp <= 0: # 僵尸死亡
             dead_list.append((monster_pos, mtype, time.time())) # 添加死亡僵尸
         else:
-            new_monster_list.append((monster_pos, mtype, hp)) # 追加到新的僵尸序列中
+            new_monster_list.append((monster_pos, mtype, hp, ID)) # 追加到新的僵尸序列中
     monster_list = new_monster_list
     return crashed
 
 def add_monster(monster_pos, mtype, hp): # 追加一个怪物
     global monster_list
     global last_monster
+    global monster_count
+    monster_count += 1
     if len(monster_list) < Config.MONSTER_MAX:
-        monster_list.append((monster_pos, mtype, hp))
+        monster_list.append((monster_pos, mtype, hp, monster_count))
         last_monster = time.time()
+
+def not_reach(pos_xy, monster_id):
+    """判断怪物是否到达了目标点"""
+    if  monster_target.get(monster_id) == None: # 没有目标的人，活着就是目标实现了
+        return True
+    else:
+        return Method.distance(pos_xy, monster_target[monster_id]) < Config.POSITION_EPS
+
+def check_monster_crash_player(): # 检测是否有僵尸打到了玩家
+    for pos_xy, mtype, hit_point, monster_id in monster_list:
+        if Method.circle_crash(Player.get_position(), Config.PLAYER_R, pos_xy, Config.MONSTER_R[mtype]):
+            Player.damage() # 让玩家掉血
+        pass
+
+def get_monster_dir(monster_pos, monster_id): # 计算怪物当前的朝向
+    # global monster_target
+    # if Method.not_in_screen(monster_pos, Player.get_position()):  # 对于不在屏幕里的怪物直接朝着玩家走
+    #     return Method.normalize(Method.vec_sub(Player.get_position(), monster_pos))
+    # else:
+    #     if monster_target.get(monster_id) != None and not_reach(monster_pos, monster_id): # 对于有目标的怪物，不用重新制作目标了
+    #         pass
+    #     else:
+    #         if Method.in_midddle(monster_pos): # 没有目标结点
+    #             astar = Astar.Astar(monster_pos, Player.get_position())
+    #             monster_target[monster_id] = astar.solve()
+    #         else:
+    #             monster_target[monster_id] = Method.get_mid_of_block(Method.get_block_xy(*monster_pos))
+    #     return Method.normalize(Method.vec_sub(monster_target[monster_id], monster_pos)) # 向着目标前进
+
+    return Method.normalize(Method.vec_sub(Player.get_position(), monster_pos)) # 向着玩家前进
+
+    # else:
+    #     astar = Astar.Astar(monster_pos, Player.get_position())
+    #     return astar.solve() # 根据算法找到最优路径
 
 def move_monster(): # 将所有 Monster 向前移动一定长度
     global monster_list
     new_monster_list = []
-    for monster_pos, mtype, hp in monster_list:
-        delta_vec = Method.vec_mul(Method.normalize(Method.vec_sub(Player.get_position(), monster_pos)), Config.MONSTER_SPEED)
+    for monster_pos, mtype, hp, monster_id in monster_list: # monster ID
+        # delta_vec = Method.vec_mul(Method.normalize(Method.vec_sub(Player.get_position(), monster_pos)), Config.MONSTER_SPEED)
+        delta_vec = Method.vec_mul(get_monster_dir(monster_pos, monster_id), Config.MONSTER_SPEED)
         new_pos = Method.vec_add(monster_pos, delta_vec)
         monster_pos = Map.test_new_pos(new_pos, monster_pos)
         if hp > 0:
-            new_monster_list.append((monster_pos, mtype, hp))
+            new_monster_list.append((monster_pos, mtype, hp, monster_id))
     monster_list = new_monster_list
     # print(len(monster_list)) # 打印怪物的总数
 
@@ -58,12 +101,7 @@ def draw_moster(screen, mid_x, mid_y, monster_type):
 
 def create_monster_demo(): # 演示性制造僵尸
     if time.time() - last_monster >= Config.MONSTER_SPAN and Config.MONSTER_OK:
-        r = random.randint(Map.get_maxlen() // 2, Map.get_maxlen() * 2)
-        theta = random.randint(-180, 179) / 360 * 2 * math.pi # rad
-        dx = r * math.cos(theta)
-        dy = r * math.sin(theta)
-        x = Player.position_x + dx
-        y = Player.position_y + dy
+        x, y = Method.random_near_position(Player.position_x, Player.position_y, Map.get_maxlen() // 2, Map.get_maxlen() * 2)
         if Method.not_in_screen((x, y), Player.get_position()): # 只在地图外生成僵尸
             add_monster((x, y), "MONSTER_ZOMBIE", random.randint(3, 5))
 
@@ -78,15 +116,15 @@ def draw_all_moster(screen):
     if Config.GAME_RUNNING: # 游戏结束后不要再移动 monster
         move_monster()
     new_monster_list = []
-    for monster_pos, mtype, hp in monster_list:
+    for monster_pos, mtype, hp, ID in monster_list:
         if Method.in_sight(monster_pos, Player.get_position(), Map.get_dxdy()):
             draw_moster(screen, monster_pos[0], monster_pos[1], mtype)
-            new_monster_list.append((monster_pos, mtype, hp))
+            new_monster_list.append((monster_pos, mtype, hp, ID))
         else:
             if Method.distance(monster_pos, Player.get_position()) >= 2 * Map.get_maxlen(): # 对距离太远的僵尸进行 despwan
                 pass
             else:
-                new_monster_list.append((monster_pos, mtype, hp))
+                new_monster_list.append((monster_pos, mtype, hp, ID))
     monster_list = new_monster_list
 
     new_dead_list = []
